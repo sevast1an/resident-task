@@ -18,10 +18,11 @@ const useStyles = makeStyles({
   }
 });
 
-const FilterItem = ({ name, options }) => {
+const FilterItem = ({ name, options, test, selectedOptions }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selected, setSelected] = React.useState([]);
   const { popover, actionBtns, selectedFilter } = useStyles();
+  // const [selectedTest, setSelectedTest] = React.useState(selectedOptions);
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -32,6 +33,13 @@ const FilterItem = ({ name, options }) => {
   };
 
   const handleSelect = option => {
+    test({
+      name,
+      value: { id: option.id, title: option.title }
+    });
+    // if(selectedOptions.includes(option.id)){
+
+    // }
     if (selected.includes(option.id)) {
       const updatedArr = selected.filter(item => item !== option.id);
       setSelected(updatedArr);
@@ -52,7 +60,8 @@ const FilterItem = ({ name, options }) => {
   const isOpen = Boolean(anchorEl);
   const id = isOpen ? "simple-popover" : undefined;
 
-  console.log(selected, "selected");
+  // console.log(selected, "selected FilterITEM");
+  console.log(selectedOptions, "selectedOptions FilterITEM");
 
   return (
     <Grid item>
@@ -121,7 +130,9 @@ const FilterItem = ({ name, options }) => {
 
 FilterItem.propTypes = {
   name: PropTypes.string.isRequired,
-  options: PropTypes.arrayOf(PropTypes.object).isRequired
+  options: PropTypes.arrayOf(PropTypes.object).isRequired,
+  selectedOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
+  test: PropTypes.func.isRequired
 };
 
 export default FilterItem;
