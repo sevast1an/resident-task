@@ -3,9 +3,12 @@ import { makeStyles } from "@material-ui/core";
 const useStyles = makeStyles({
   popover: {
     "& .MuiPopover-paper": {
-      maxWidth: "260px",
+      width: "260px",
       padding: "10px"
     }
+  },
+  filterStyles: {
+    border: "1px solid #3f51b5"
   },
   selectedFilter: {
     border: "1px solid white"

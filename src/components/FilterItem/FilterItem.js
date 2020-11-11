@@ -5,29 +5,17 @@ import PropTypes from "prop-types";
 import OptionItem from "../OptionItem/OptionItem";
 import useStyles from "./styles";
 
-const FilterItem = ({
-  name,
-  options,
-  handleFilter,
-  selectedOptions,
-  values
-}) => {
+const FilterItem = ({ name, options, handleFilter, values }) => {
+  const { popover, actionBtns, selectedFilter, filterStyles } = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const { popover, actionBtns, selectedFilter } = useStyles();
+  const [temporarySelected, setTemporarySelected] = React.useState(values);
 
-  const filterObj = selectedOptions[0];
   const isOpen = Boolean(anchorEl);
   const id = isOpen ? "simple-popover" : undefined;
 
-  const [temporarySelected, setTemporarySelected] = React.useState(
-    filterObj.values
-  );
-
   React.useEffect(() => {
-    setTemporarySelected(filterObj.values);
-  }, [filterObj.values]);
-
-  console.log({ name, state: temporarySelected, values });
+    setTemporarySelected(values);
+  }, [values]);
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -35,6 +23,7 @@ const FilterItem = ({
 
   const handleClose = () => {
     setAnchorEl(null);
+    setTemporarySelected(values);
   };
 
   const handleSelect = option => {
@@ -51,24 +40,13 @@ const FilterItem = ({
   const handleReset = () => {
     handleClose();
     setTemporarySelected([]);
-    handleFilter({
-      name,
-      values: []
-    });
+    handleFilter(name, []);
   };
 
   const handleSaveFilters = () => {
     handleClose();
-    handleFilter({
-      name,
-      values: temporarySelected
-    });
-    // setTemporarySelected([]);
+    handleFilter(name, temporarySelected);
   };
-
-  // console.log(selected, "selected FilterITEM");
-  console.log(selectedOptions, "selectedOptions FilterITEM", name);
-  console.log(temporarySelected, "temporarySelected");
 
   return (
     <Grid item>
@@ -77,17 +55,15 @@ const FilterItem = ({
         variant="contained"
         color="primary"
         onClick={handleClick}
-        className={isOpen || !!filterObj.values.length ? selectedFilter : ""}
+        className={isOpen || values.length ? selectedFilter : filterStyles}
       >
-        {`${name} ${
-          filterObj.values.length ? `(${filterObj.values.length})` : ""
-        }`}
+        {`${name} ${values.length ? `(${values.length})` : ""}`}
       </Button>
       <Popover
         id={id}
         open={isOpen}
         anchorEl={anchorEl}
-        // onClose={handleClose}
+        onClose={handleClose}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "center"
@@ -142,7 +118,6 @@ const FilterItem = ({
 FilterItem.propTypes = {
   name: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
-  selectedOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
   handleFilter: PropTypes.func.isRequired,
   values: PropTypes.arrayOf(PropTypes.object).isRequired
 };
