@@ -1,39 +1,21 @@
 import React from "react";
-import { Popover, Button, Grid, makeStyles } from "@material-ui/core";
+import { Popover, Button, Grid } from "@material-ui/core";
 import PropTypes from "prop-types";
+
 import OptionItem from "../OptionItem/OptionItem";
+import useStyles from "./styles";
 
-const useStyles = makeStyles({
-  popover: {
-    "& .MuiPopover-paper": {
-      maxWidth: "300px",
-      padding: "10px"
-    }
-  },
-  selectedFilter: {
-    border: "1px solid white"
-  },
-  actionBtns: {
-    marginTop: "20px"
-  }
-});
-
-const FilterItem = ({
-  name,
-  options,
-  handleFilter,
-  selectedOptions,
-  handleTestFilter
-}) => {
+const FilterItem = ({ name, options, handleFilter, selectedOptions }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [selected, setSelected] = React.useState([]);
-  const [temporarySelected, setTemporarySelected] = React.useState([]);
   const { popover, actionBtns, selectedFilter } = useStyles();
 
-  const filterObj = !!selectedOptions.length
-    ? selectedOptions[0]
-    : { values: [] };
-  console.log(filterObj, "filterObj");
+  const filterObj = selectedOptions[0];
+  const isOpen = Boolean(anchorEl);
+  const id = isOpen ? "simple-popover" : undefined;
+
+  const [temporarySelected, setTemporarySelected] = React.useState(
+    filterObj.values
+  );
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -44,25 +26,6 @@ const FilterItem = ({
   };
 
   const handleSelect = option => {
-    // const isOptionSelected = filterObj.values.find(
-    //   item => item.id === option.id
-    // );
-    // // console.log("testObj", testObj);
-    // if (!!isOptionSelected) {
-    //   console.log("este deja");
-    // } else {
-    //   handleFilter({
-    //     name,
-    //     value: { id: option.id, title: option.title }
-    //   });
-    // }
-    // if (selected.includes(option.id)) {
-    //   const updatedArr = selected.filter(item => item !== option.id);
-    //   setSelected(updatedArr);
-    // } else {
-    //   setSelected([...selected, option.id]);
-    // }
-
     if (!!temporarySelected.find(item => item.id === option.id)) {
       const temporaryUpdatedArr = temporarySelected.filter(
         item => item.id !== option.id
@@ -75,19 +38,20 @@ const FilterItem = ({
 
   const handleReset = () => {
     handleClose();
-    setSelected([]);
+    setTemporarySelected([]);
+    handleFilter({
+      name,
+      values: []
+    });
   };
 
   const handleSaveFilters = () => {
     handleClose();
-    handleTestFilter({
+    handleFilter({
       name,
       values: temporarySelected
     });
   };
-
-  const isOpen = Boolean(anchorEl);
-  const id = isOpen ? "simple-popover" : undefined;
 
   // console.log(selected, "selected FilterITEM");
   console.log(selectedOptions, "selectedOptions FilterITEM");
@@ -100,9 +64,11 @@ const FilterItem = ({
         variant="contained"
         color="primary"
         onClick={handleClick}
-        className={isOpen || !!selected.length ? selectedFilter : ""}
+        className={isOpen || !!filterObj.values.length ? selectedFilter : ""}
       >
-        {`${name} ${selected.length ? `(${selected.length})` : ""}`}
+        {`${name} ${
+          filterObj.values.length ? `(${filterObj.values.length})` : ""
+        }`}
       </Button>
       <Popover
         id={id}
@@ -126,14 +92,16 @@ const FilterItem = ({
                 key={option.id}
                 option={option}
                 handleSelect={handleSelect}
-                isSelected={selected.includes(option.id)}
+                isSelected={
+                  !!temporarySelected.find(item => item.id === option.id)
+                }
               />
             </Grid>
           ))}
         </Grid>
-        {!!selected.length && (
-          <Grid container justify="space-between" className={actionBtns}>
-            <Grid item>
+        <Grid container justify="space-between" className={actionBtns}>
+          <Grid item>
+            {!!temporarySelected.length && (
               <Button
                 variant="outlined"
                 color="primary"
@@ -141,18 +109,18 @@ const FilterItem = ({
               >
                 Cancel
               </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={() => handleSaveFilters()}
-              >
-                Apply
-              </Button>
-            </Grid>
+            )}
           </Grid>
-        )}
+          <Grid item>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => handleSaveFilters()}
+            >
+              Apply
+            </Button>
+          </Grid>
+        </Grid>
       </Popover>
     </Grid>
   );
@@ -162,8 +130,7 @@ FilterItem.propTypes = {
   name: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
   selectedOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
-  handleFilter: PropTypes.func.isRequired,
-  handleTestFilter: PropTypes.func.isRequired
+  handleFilter: PropTypes.func.isRequired
 };
 
 export default FilterItem;

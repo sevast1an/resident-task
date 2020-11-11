@@ -1,41 +1,77 @@
 import React, { useState } from "react";
-import { Grid, Box } from "@material-ui/core";
+import { Grid, Box, Typography, makeStyles } from "@material-ui/core";
 import "./App.css";
 import { filtersData } from "./constants";
 import FilterItem from "./components/FilterItem/FilterItem";
 
+const useStyles = makeStyles({
+  selectedItem: {
+    padding: "5px 10px",
+    margin: "0px 10px 10px",
+    border: "1px solid black",
+    borderRadius: "5px",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      borderColor: "red",
+      color: "red"
+    },
+    "& span": {
+      paddingLeft: "15px"
+    }
+  },
+  filterHeading: {
+    minWidth: "150px",
+    marginBottom: "10px"
+  },
+  filterRow: {
+    marginBottom: "20px"
+  }
+});
+
 const App = () => {
-  console.log(filtersData, "filtersData");
-  const [selected, setSelected] = useState([]);
-  const [testSelected, setTestSelected] = useState([]);
+  const filtersInitialState = Object.entries(filtersData).map(([name]) => ({
+    name,
+    values: []
+  }));
+  const [selected, setSelected] = useState(filtersInitialState);
+  const { selectedItem, filterHeading, filterRow } = useStyles();
 
-  // const handleFilter = filterObj => {
-  //   console.log(filterObj, "filterObj");
-  //   const selectedFilter = selected.find(({ name }) => name === filterObj.name);
-  //   if (!!selectedFilter) {
-  //     const otherSelectedFilters = selected.filter(
-  //       item => item.name !== filterObj.name
-  //     );
-  //     console.log(selectedFilter, "selectedFilter", filterObj, "filterObj");
-  //     setSelected([
-  //       ...otherSelectedFilters,
-  //       {
-  //         name: selectedFilter.name,
-  //         values: [...selectedFilter.values, filterObj.value]
-  //       }
-  //     ]);
-  //   } else {
-  //     setSelected([
-  //       ...selected,
-  //       { name: filterObj.name, values: [filterObj.value] }
-  //     ]);
-  //   }
-  // };
-
-  const handleTestFilter = filterTestObj => {
-    console.log(filterTestObj, "filterTestObj");
+  const handleFilter = filterObj => {
+    console.log(filterObj, "filterObj");
+    const selectedFilter = selected.find(({ name }) => name === filterObj.name);
+    const otherSelectedFilters = selected.filter(
+      item => item.name !== filterObj.name
+    );
+    console.log(selectedFilter, "selectedFilter", filterObj, "filterObj");
+    setSelected([
+      ...otherSelectedFilters,
+      {
+        name: filterObj.name,
+        values: [...filterObj.values]
+      }
+    ]);
   };
-  console.log(selected, "ahue");
+
+  const deleteOption = (filterItem, option) => {
+    const udatedFilterOptions = filterItem.values.filter(
+      item => item.id !== option.id
+    );
+    handleFilter({
+      name: filterItem.name,
+      values: udatedFilterOptions
+    });
+  };
+
+  const clearAll = name => {
+    handleFilter({
+      name,
+      values: []
+    });
+  };
+
+  const filtersToShow = selected.filter(item => !!item.values.length);
+
   return (
     <div className="App">
       <header className="App-header">
@@ -45,30 +81,72 @@ const App = () => {
               name={name}
               options={options}
               key={idx}
-              // handleFilter={handleFilter}
-              // selectedOptions={selected.filter(
-              //   (option) => option.name === name
-              // )}
-              selectedOptions={testSelected.filter(
-                option => option.name === name
-              )}
-              handleTestFilter={handleTestFilter}
+              selectedOptions={selected.filter(option => option.name === name)}
+              handleFilter={handleFilter}
             />
           ))}
         </Grid>
       </header>
-      <main>
-        <Box mt={4}>Applied Filters: -- none --</Box>
-        <Box>
-          {selected.map(item => (
-            <Box key={item.name}>
-              <Box>{item.name}</Box>
-              {item.values.map(value => (
-                <Box key={value.id}>{value.title}</Box>
-              ))}
-            </Box>
-          ))}
-        </Box>
+      <main className="App-main">
+        <Grid container spacing={2}>
+          <Grid container item>
+            <Grid item xs={12}>
+              <Box mb={3} display="flex" alignItems="flex-start">
+                <Typography variant="h5">Applied Filters:</Typography>
+              </Box>
+            </Grid>
+            {!!filtersToShow.length ? (
+              <>
+                {filtersToShow.map(item => (
+                  <Grid
+                    container
+                    item
+                    xs={12}
+                    key={item.name}
+                    className={filterRow}
+                  >
+                    <Box className={filterHeading}>
+                      <Typography
+                        color="primary"
+                        align="left"
+                      >{`${item.name.toUpperCase()}: `}</Typography>
+                    </Box>
+                    <Box display="flex" flexWrap="wrap">
+                      {item.values.map(value => (
+                        <Box
+                          key={value.id}
+                          className={selectedItem}
+                          display="flex"
+                          justifyContent="center"
+                          alignItems="center"
+                          onClick={() => deleteOption(item, value)}
+                        >
+                          <Typography>{value.title}</Typography>
+                          <span>X</span>
+                        </Box>
+                      ))}
+                      <Box
+                        key="delete"
+                        className={selectedItem}
+                        display="flex"
+                        justifyContent="center"
+                        alignItems="center"
+                        onClick={() => clearAll(item.name)}
+                      >
+                        <Typography>Clear All</Typography>
+                        <span>X</span>
+                      </Box>
+                    </Box>
+                  </Grid>
+                ))}
+              </>
+            ) : (
+              <Box mt={4} display="flex" alignItems="flex-start">
+                -- none --
+              </Box>
+            )}
+          </Grid>
+        </Grid>
       </main>
     </div>
   );
