@@ -18,11 +18,22 @@ const useStyles = makeStyles({
   }
 });
 
-const FilterItem = ({ name, options, test, selectedOptions }) => {
+const FilterItem = ({
+  name,
+  options,
+  handleFilter,
+  selectedOptions,
+  handleTestFilter
+}) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selected, setSelected] = React.useState([]);
+  const [temporarySelected, setTemporarySelected] = React.useState([]);
   const { popover, actionBtns, selectedFilter } = useStyles();
-  // const [selectedTest, setSelectedTest] = React.useState(selectedOptions);
+
+  const filterObj = !!selectedOptions.length
+    ? selectedOptions[0]
+    : { values: [] };
+  console.log(filterObj, "filterObj");
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -33,18 +44,32 @@ const FilterItem = ({ name, options, test, selectedOptions }) => {
   };
 
   const handleSelect = option => {
-    test({
-      name,
-      value: { id: option.id, title: option.title }
-    });
-    // if(selectedOptions.includes(option.id)){
-
+    // const isOptionSelected = filterObj.values.find(
+    //   item => item.id === option.id
+    // );
+    // // console.log("testObj", testObj);
+    // if (!!isOptionSelected) {
+    //   console.log("este deja");
+    // } else {
+    //   handleFilter({
+    //     name,
+    //     value: { id: option.id, title: option.title }
+    //   });
     // }
-    if (selected.includes(option.id)) {
-      const updatedArr = selected.filter(item => item !== option.id);
-      setSelected(updatedArr);
+    // if (selected.includes(option.id)) {
+    //   const updatedArr = selected.filter(item => item !== option.id);
+    //   setSelected(updatedArr);
+    // } else {
+    //   setSelected([...selected, option.id]);
+    // }
+
+    if (!!temporarySelected.find(item => item.id === option.id)) {
+      const temporaryUpdatedArr = temporarySelected.filter(
+        item => item.id !== option.id
+      );
+      setTemporarySelected(temporaryUpdatedArr);
     } else {
-      setSelected([...selected, option.id]);
+      setTemporarySelected([...temporarySelected, option]);
     }
   };
 
@@ -55,6 +80,10 @@ const FilterItem = ({ name, options, test, selectedOptions }) => {
 
   const handleSaveFilters = () => {
     handleClose();
+    handleTestFilter({
+      name,
+      values: temporarySelected
+    });
   };
 
   const isOpen = Boolean(anchorEl);
@@ -62,6 +91,7 @@ const FilterItem = ({ name, options, test, selectedOptions }) => {
 
   // console.log(selected, "selected FilterITEM");
   console.log(selectedOptions, "selectedOptions FilterITEM");
+  console.log(temporarySelected, "temporarySelected");
 
   return (
     <Grid item>
@@ -132,7 +162,8 @@ FilterItem.propTypes = {
   name: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
   selectedOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
-  test: PropTypes.func.isRequired
+  handleFilter: PropTypes.func.isRequired,
+  handleTestFilter: PropTypes.func.isRequired
 };
 
 export default FilterItem;
