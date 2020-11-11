@@ -11,7 +11,7 @@ const OptionItem = ({ option, handleSelect, isSelected }) => {
       className={`${optionStyles} ${isSelected ? selected : ""}`}
       onClick={() => handleSelect(option)}
     >
-      <Typography>{option.title}</Typography>
+      <Typography className="option-enzyme">{option.title}</Typography>
     </Box>
   );
 };

@@ -8,6 +8,7 @@ import useStyles from "./styles";
 const FilterItem = ({ name, options, handleFilter, values }) => {
   const { popover, actionBtns, selectedFilter, filterStyles } = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
+  //Set a local state based on values from globalState, update it on other options select
   const [temporarySelected, setTemporarySelected] = React.useState(values);
 
   const isOpen = Boolean(anchorEl);
@@ -17,15 +18,18 @@ const FilterItem = ({ name, options, handleFilter, values }) => {
     setTemporarySelected(values);
   }, [values]);
 
+  // Handle open popover
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
   };
 
+  // Handle close popover
   const handleClose = () => {
     setAnchorEl(null);
     setTemporarySelected(values);
   };
 
+  //Check if option was already selected or not and set it or delete from temporarySelected
   const handleSelect = option => {
     if (!!temporarySelected.find(item => item.id === option.id)) {
       const temporaryUpdatedArr = temporarySelected.filter(
@@ -37,19 +41,21 @@ const FilterItem = ({ name, options, handleFilter, values }) => {
     }
   };
 
+  // Reset filter selected options
   const handleReset = () => {
     handleClose();
     setTemporarySelected([]);
     handleFilter(name, []);
   };
 
+  // Confirm save of the selected options
   const handleSaveFilters = () => {
     handleClose();
     handleFilter(name, temporarySelected);
   };
 
   return (
-    <Grid item>
+    <Grid item className="enzyme-filter-item">
       <Button
         aria-describedby={id}
         variant="contained"

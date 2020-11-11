@@ -7,16 +7,20 @@ import { filtersData } from "../constants";
 import FilterItem from "../components/FilterItem/FilterItem";
 
 const FiltersPage = ({ initialData }) => {
+  // Set initial data, for every filter we have an empty selected values array
   const [globalState, setGlobalState] = useState(initialData);
   const { selectedItem, filterHeading, filterRow } = useStyles();
 
+  // Show selected filters
   const filtersToShow = Object.entries(globalState)
     .map(([name, values]) => ({ name, values }))
     .filter(item => !!item.values.length);
 
+  // General update globalState function
   const setUpdate = (name, newState) =>
     setGlobalState({ ...globalState, [name]: newState });
 
+  // Delete an option from selected filter options
   const deleteOption = (filterName, option) => {
     const udatedFilterOptions = globalState[filterName].filter(
       item => item.id !== option.id
@@ -24,6 +28,7 @@ const FiltersPage = ({ initialData }) => {
     setGlobalState({ ...globalState, [filterName]: udatedFilterOptions });
   };
 
+  //Clear all options for a filter
   const clearAll = name => {
     setUpdate(name, []);
   };
@@ -98,7 +103,7 @@ const FiltersPage = ({ initialData }) => {
               </>
             ) : (
               <Box mt={4} display="flex" alignItems="flex-start">
-                -- none --
+                <Typography className="enzyme">-- none --</Typography>
               </Box>
             )}
           </Grid>
