@@ -5,7 +5,13 @@ import PropTypes from "prop-types";
 import OptionItem from "../OptionItem/OptionItem";
 import useStyles from "./styles";
 
-const FilterItem = ({ name, options, handleFilter, selectedOptions }) => {
+const FilterItem = ({
+  name,
+  options,
+  handleFilter,
+  selectedOptions,
+  values
+}) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const { popover, actionBtns, selectedFilter } = useStyles();
 
@@ -16,6 +22,12 @@ const FilterItem = ({ name, options, handleFilter, selectedOptions }) => {
   const [temporarySelected, setTemporarySelected] = React.useState(
     filterObj.values
   );
+
+  React.useEffect(() => {
+    setTemporarySelected(filterObj.values);
+  }, [filterObj.values]);
+
+  console.log({ name, state: temporarySelected, values });
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -51,10 +63,11 @@ const FilterItem = ({ name, options, handleFilter, selectedOptions }) => {
       name,
       values: temporarySelected
     });
+    // setTemporarySelected([]);
   };
 
   // console.log(selected, "selected FilterITEM");
-  console.log(selectedOptions, "selectedOptions FilterITEM");
+  console.log(selectedOptions, "selectedOptions FilterITEM", name);
   console.log(temporarySelected, "temporarySelected");
 
   return (
@@ -130,7 +143,8 @@ FilterItem.propTypes = {
   name: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
   selectedOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
-  handleFilter: PropTypes.func.isRequired
+  handleFilter: PropTypes.func.isRequired,
+  values: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
 export default FilterItem;

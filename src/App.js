@@ -30,6 +30,24 @@ const useStyles = makeStyles({
 });
 
 const App = () => {
+  /*
+    const [globalState, setGlobalState] = React.useState(globalState);
+  const globalState = Object.entries(filtersData).reduce(
+    (acc, [name]) => ({
+      ...acc,
+      [name]: []
+    }),
+    {}
+  );
+
+  const setUpdate = (name, newState:[]) => setGlobalState({...globalState, [name]: newState})
+
+  <FilterItem
+  ...
+  setUpdate={setUpdate}
+  values={globalState[name]}
+  />
+  */
   const filtersInitialState = Object.entries(filtersData).map(([name]) => ({
     name,
     values: []
@@ -82,6 +100,9 @@ const App = () => {
               options={options}
               key={idx}
               selectedOptions={selected.filter(option => option.name === name)}
+              values={
+                selected.filter(option => option.name === name)[0].values || []
+              }
               handleFilter={handleFilter}
             />
           ))}

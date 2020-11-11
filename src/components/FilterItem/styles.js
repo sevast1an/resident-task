@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core";
 const useStyles = makeStyles({
   popover: {
     "& .MuiPopover-paper": {
-      maxWidth: "300px",
+      maxWidth: "260px",
       padding: "10px"
     }
   },
