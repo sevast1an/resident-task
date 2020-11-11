@@ -1,25 +1,17 @@
-import React, { useState } from "react";
-import { Grid, Box } from "@material-ui/core";
+import React from "react";
 import "./App.css";
 import { filtersData } from "./constants";
-import FilterItem from "./components/FilterItem/FilterItem";
+import FiltersPage from "./pages/FiltersPage";
 
 const App = () => {
-  console.log(filtersData, "filtersData");
-  return (
-    <div className="App">
-      <header className="App-header">
-        <Grid container spacing={2}>
-          {Object.entries(filtersData).map(([name, options], idx) => (
-            <FilterItem name={name} options={options} key={idx} />
-          ))}
-        </Grid>
-      </header>
-      <main>
-        <Box mt={4}>Applied Filters: -- none --</Box>
-      </main>
-    </div>
+  const initialGlobalState = Object.entries(filtersData).reduce(
+    (acc, [name]) => ({
+      ...acc,
+      [name]: []
+    }),
+    {}
   );
+  return <FiltersPage initialData={initialGlobalState} />;
 };
 
 export default App;
